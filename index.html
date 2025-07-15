@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Converter</title>
+  <link rel="stylesheet" href="style.css">
+  <style>body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+  background-color: #f9f9f9;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Converter</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <select id="format">
+      <option value="png">Convert to PNG</option>
+      <option value="jpeg">Convert to JPEG</option>
+      <option value="webp">Convert to WEBP</option>
+    </select>
+    <button onclick="convertImage()">Convert</button>
+    <br/>
+    <a id="downloadLink" style="display:none;" download="converted-image">Download Converted Image</a>
+    <canvas id="canvas" style="display: none;"></canvas>
+  </div>
+  <script>
+function convertImage() {
+  const fileInput = document.getElementById('imageInput');
+  const format = document.getElementById('format').value;
+  const canvas = document.getElementById('canvas');
+  const downloadLink = document.getElementById('downloadLink');
+
+  if (!fileInput.files.length) {
+    alert('Please upload an image first.');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const mimeType = `image/${format}`;
+      const convertedImageURL = canvas.toDataURL(mimeType);
+
+      downloadLink.href = convertedImageURL;
+      downloadLink.download = `converted-image.${format}`;
+      downloadLink.style.display = 'inline';
+    };
+    img.src = e.target.result;
+  };
+
+  reader.readAsDataURL(file);
+}
+  </script>
+</body>
+</html>
